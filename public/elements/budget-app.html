@@ -1,0 +1,191 @@
+<link rel="import"  href="../components/polymer/polymer.html">
+<link rel="import" href="../components/app-route/app-location.html">
+<link rel="import" href="../components/app-route/app-route.html">
+<link rel="import" href="../components/iron-selector/iron-selector.html">
+<link rel="import" href="../components/iron-pages/iron-pages.html">
+<link rel="import" href="budget-login.html">
+<link rel="import" href="budget-overview.html">
+<link rel="import" href="new-category.html">
+<!-- import style module  -->
+<link rel="import" href="bs-styles.html">
+
+<dom-module id="budget-app">
+  <template>
+    <!-- consume the style module-->
+    <style is="custom-style" include="bs-styles"></style>
+    <style>
+      :host {
+        display: block;
+      }
+
+      a:hover {
+        cursor: pointer;
+      }
+
+      .views {
+        margin-top: 50px;
+      }
+    </style>
+    <!--Data Handler-->
+    <!--<budget-data user={{firebase}}></budget-data>-->
+
+    <!--Route handler-->
+    <app-location route="{{route}}" use-hash-as-path></app-location>
+    <app-route
+        route="{{route}}"
+        pattern="/:page"
+        data="{{routeData}}"
+        tail="{{subroute}}"></app-route>
+    <iron-selector selected="[[page]]" attr-for-selected="name" class="drawer-list" role="navigation">
+      <nav class="pure-menu pure-menu-horizontal">
+        <ul class="pure-menu-list">
+          <li class="pure-menu-item"><a class="pure-menu-link" name="home" href="#/home">Overview</a></li>
+          <li class="pure-menu-item"><a class="pure-menu-link" name="login" href="#/login">Login</a></li>
+          <li class="pure-menu-item"><a class="pure-menu-link" on-tap="signOut">Sign Out</a></li>
+          <li class="pure-menu-item"><a class="pure-menu-link" on-tap="getItems">Get Items</a></li>
+        </ul>
+      </nav>
+    </iron-selector>
+    <iron-pages
+        class='views'
+        selected="[[page]]"
+        attr-for-selected="name"
+        fallback-selection="view404"
+        role="main">
+      <budget-overview name="home"></budget-overview>
+      <!--Log in View-->
+      <budget-login name="login"></budget-login>
+      <new-category name="new-category"></new-category>
+      <p name="view404">404</p>
+    </iron-pages>
+  </template>
+  <script>
+    // Initialize Firebase
+    var config = {
+      apiKey: "AIzaSyCWL3D86-JOSBusrf2pkTamQH-XcYiPleo",
+      authDomain: "mybudget-c0f97.firebaseapp.com",
+      databaseURL: "https://mybudget-c0f97.firebaseio.com",
+      storageBucket: "mybudget-c0f97.appspot.com",
+      messagingSenderId: "825455221523"
+    };
+    firebase.initializeApp(config);
+
+    // Get a reference to the database service
+    var database = firebase.database();
+
+    Polymer({
+      is: 'budget-app',
+      properties: {
+        page: {
+          type: String,
+          reflectToAttribute: true
+        },
+        items: {
+          type: Object,
+          value: function() {
+            return {};
+          }
+        }
+      },
+      observers: [
+        '_routePageChanged(routeData.page)',
+      ],
+      listeners : {
+      'register-user': 'register',
+      'sign-in-user': 'signIn',
+      'iron-select': 'loginCheck'
+      },
+      _routePageChanged: function(page) {
+        this.page = page || 'home';
+      },
+      /*
+      * Register a new user
+      */
+      register: function(e) {
+        var email = e.detail.email;
+        var password = e.detail.password;
+        var firstName = e.detail.firstName;
+        var lastName = e.detail.lastName;
+        // Create user
+        firebase.auth().createUserWithEmailAndPassword(email, password).then(function(data) {
+          // For debugging
+          console.log("Successfully created user",data);
+          // Add user to the list of users
+          firebase.database().ref('users/' + data.uid + '/userInfo').set({
+            email: data.email,
+            firstName: firstName,
+            lastName: lastName,
+            lastYearEdited: null
+          });
+          // redirect to dashboard
+          window.location.replace(window.location.origin + "/")
+        },function(error) {
+          // Handle Errors here.
+          var errorCode = error.code;
+          var errorMessage = error.message;
+          // Log that an error occured
+          console.error("Error Registering:", errorMessage);
+        });
+      },
+      /**
+      * Sign in
+      */
+      signIn: function(e) {
+        var email = e.detail.email;
+        var password = e.detail.password;
+        var _this = this;
+        firebase.auth().signInWithEmailAndPassword(email, password).then(function(user) {
+          _this.getItems(user.uid);
+          // redirect to dashboard
+          window.location.replace(window.location.origin + "/")
+        }, function(error) {
+          // Handle Errors here.
+          var errorCode = error.code;
+          var errorMessage = error.message;
+          // Log that an error occured
+          console.error('Sign in error:', error.message);
+        });
+      },
+      /**
+      * Sign out
+      */
+      signOut: function() {
+        var _this = this;
+        firebase.auth().signOut().then(function() {
+          // Sign-out successful.
+          console.log('You have signed out!');
+          _this.userId = '';
+        }, function(error) {
+          // An error happened.
+          console.log('There was an error logging you out');
+        });
+      },
+      loginCheck: function(e) {
+        //check if logged in
+        firebase.auth().onAuthStateChanged(function(user) {
+          if (user) {
+            // User is signed in.
+            console.log("You are signed in!", user.email)
+            this.userId = user.uid;
+          } else {
+            // No user is signed in.
+            console.log('no user is logged in');
+            window.location.replace(window.location.origin + "/#/login")
+          }
+        }.bind(this));
+      },
+      /**
+      * Test function for pulling down user data
+      */
+      getItems: function() {
+        var userId = firebase.auth().currentUser.uid;
+        var _this = this;
+      // Pull down their data
+      firebase.database().ref('/users/' + userId + '/userInfo').once('value').then(function(snapshot) {
+        console.log('snapshot', snapshot.val())
+        _this.firstName = snapshot.val().firstName;
+      });
+      }
+    });
+  </script>
+</dom-module>

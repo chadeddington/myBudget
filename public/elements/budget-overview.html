@@ -1,0 +1,70 @@
+<link rel="import" href="bs-styles.html">
+<dom-module id="budget-overview">
+  <template>
+    <style is="custom-style" include="bs-styles"></style>
+    <style>
+      .today {
+        font-weight: 100;
+      }
+    </style>
+
+    <div> 
+      <h2 class='today'>Today is <span>[[date]]</span></h2>
+    </div>
+
+    <form class="pure-form pure-form-stacked form-group">
+      <fieldset>
+          <label for="name">Category Name:</label>
+          <input id="name" type="text" placeholder="Category Name" value="{{categoryName::input}}">
+          <label for="budget">Budget:</label>
+          <input id="budget" type="number" placeholder="0.00" value="{{budget::input}}">
+          <button type="submit" class="pure-button pure-button-primary">Create New Category</button>
+      </fieldset>
+    </form>
+    
+  </template>
+  <script>
+    var weekday = [
+      'Sunday',
+      'Monday',
+      'Tuesday',
+      'Wednesday',
+      'Thursday',
+      'Friday',
+      'Saturday'
+    ];
+
+    var month = [
+      'January',
+      'February',
+      'March',
+      'April',
+      'May',
+      'June',
+      'July',
+      'August',
+      'September',
+      'October',
+      'Novermber',
+      'December'
+    ]
+    Polymer({
+      is: 'budget-overview',
+      properties: {
+        items: {
+          type: Array,
+          value: function() {
+            return [];
+          }
+        },
+        date: {
+          type: String,
+          value: function() {
+            var d = new Date();
+            return weekday[d.getDay()] + ' ' + month[d.getMonth()] + ' ' + d.getDate() + ', ' + d.getFullYear();
+          }
+        }
+      }
+    });
+  </script>
+</dom-module>

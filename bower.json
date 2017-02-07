@@ -1,0 +1,18 @@
+{
+  "name": "myBudget",
+  "authors": [
+    "Chad Eddington <edd11001@byui.edu>"
+  ],
+  "description": "",
+  "main": "",
+  "license": "MIT",
+  "homepage": "",
+  "private": true,
+  "dependencies": {
+    "polymer": "^1.7.1",
+    "app-layout": "PolymerElements/app-layout#^0.10.0",
+    "app-route": "PolymerElements/app-route#^0.9.0",
+    "iron-pages": "PolymerElements/iron-pages#^1.0.0",
+    "iron-selector": "PolymerElements/iron-selector#^1.0.0"
+  }
+}

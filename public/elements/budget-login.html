@@ -1,0 +1,84 @@
+<link rel="import"  href="../components/polymer/polymer.html">
+<!-- import style module  -->
+<link rel="import" href="bs-styles.html">
+<dom-module id="budget-login">
+  <template>
+    <!-- consume the style module-->
+    <style is="custom-style" include="bs-styles"></style>
+    <style>
+      .form-group {
+        max-width: 300px;
+        margin: 0px auto;
+        margin-top: 50px;
+      }
+
+    </style>
+    
+    <div class="pure-form pure-form-stacked form-group">
+      <p> Log In </p>
+      <input type="text" name="username" value="{{userName::input}}" placeholder="Username">
+      <input type="password" value="{{userPass::input}}" placeholder="Password">
+      <button class="pure-button pure-button-primary" on-tap="signin">Sign In</button>
+    </div>    
+
+    <!-- Uncomment if we want to allow users to register -->
+    <!--<div class="pure-form pure-form-stacked">
+      <p>Create An Account</p>
+      <input type="text" value="{{firstName::input}}" placeholder="First name">
+      <input type="text" value="{{lastName::input}}" placeholder="Last name">
+      <input type="text" value="{{email::input}}" placeholder="Enter your email address">
+      <input type="password" value="{{pass1::input}}" placeholder="Enter a password">
+      <input type="password" value="{{pass2::input}}" placeholder="Confirm password">
+      <button class="pure-button" on-tap="register">Sign Up</button>
+    </div>  -->
+  </template>
+  <script>
+    Polymer({
+      is: 'budget-login',
+      properties: {
+        firstName: {
+          type: String,
+          value: ''
+        },
+        lastName: {
+          type: String,
+          value: ''
+        },
+        userName: {
+          type: String,
+          value: ''
+        },
+        userPass: {
+          type: String,
+          value: ''
+        },
+        email: {
+          type: String,
+          value: ''
+        },
+        pass1: {
+          type: String,
+          value: ''
+        },
+        pass2: {
+          type: String,
+          value: ''
+        }
+      },
+      register: function(e) {
+        // TODO: More in-depth checking
+        if (!this.pass1 || !this.pass2) return;
+        // Tell budget-app to register the user
+        if (this.pass1 === this.pass2) {
+          this.fire('register-user', {email: this.email, password: this.pass1, firstName: this.firstName, lastName: this.lastName});
+          this.email = '';
+          this.pass1 = '';
+          this.pass2 = '';
+        }
+      },
+      signin: function(e) {
+        this.fire('sign-in-user', {email: this.userName, password: this.userPass});
+      }
+    });
+  </script>
+</dom-module>

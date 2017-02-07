@@ -1,0 +1,40 @@
+<link rel="import" href="bs-styles.html">
+<dom-module id="new-category">
+  <template>
+    <style is="custom-style" include="bs-styles"></style>
+    <style>
+      .form-group {
+        max-width: 300px;
+        margin: 0px auto;
+        margin-top: 50px;
+      }
+    </style>
+    <form class="pure-form pure-form-stacked form-group">
+      <fieldset>
+          <legend>Create A New Category</legend>
+
+          <label for="name">Category Name</label>
+          <input id="name" type="text" placeholder="Category Name" value="{{categoryName::input}}">
+          <label for="budget">Budget</label>
+          <input id="budget" type="number" placeholder="0.00" value="{{budget::input}}">
+          <button type="submit" class="pure-button pure-button-primary">Create category</button>
+      </fieldset>
+    </form>
+    
+  </template>
+  <script>
+    Polymer({
+      is: 'new-category',
+      properties: {
+        categoryName: {
+          type: String,
+          value: ''
+        },
+        budget: {
+          type: Number,
+          value: null
+        }
+      }
+    });
+  </script>
+</dom-module>
