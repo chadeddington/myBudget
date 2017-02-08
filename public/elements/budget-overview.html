@@ -6,11 +6,23 @@
       .today {
         font-weight: 100;
       }
+      .row {
+        margin-bottom: 50px;
+      }
     </style>
 
     <div> 
-      <h2 class='today'>Today is <span>[[date]]</span></h2>
+      <h2 class='today'>Today is <span>[[dateString]]</span></h2>
     </div>
+
+    <template is="dom-repeat" items="[[items]]">
+      <div class='row'>
+        <h3>[[item.category]]</h3>
+        <div><span>Budget: $</span>[[item.budget]]</div>
+        <div><span>Spent: $</span>[[item.total]]</div>
+        <div><span>Remaining: $</span>[[_calcRemaining(item.budget, item.total)]]</div>
+      </div>
+    </template>
 
     <form class="pure-form pure-form-stacked form-group">
       <fieldset>
@@ -18,9 +30,9 @@
           <input id="name" type="text" placeholder="Category Name" value="{{categoryName::input}}">
           <label for="budget">Budget:</label>
           <input id="budget" type="number" placeholder="0.00" value="{{budget::input}}">
-          <button type="submit" class="pure-button pure-button-primary">Create New Category</button>
       </fieldset>
     </form>
+    <button class="pure-button pure-button-primary" on-tap="createCategory">Create New Category</button>
     
   </template>
   <script>
@@ -34,20 +46,6 @@
       'Saturday'
     ];
 
-    var month = [
-      'January',
-      'February',
-      'March',
-      'April',
-      'May',
-      'June',
-      'July',
-      'August',
-      'September',
-      'October',
-      'Novermber',
-      'December'
-    ]
     Polymer({
       is: 'budget-overview',
       properties: {
@@ -58,12 +56,38 @@
           }
         },
         date: {
-          type: String,
+          type: Object,
           value: function() {
-            var d = new Date();
-            return weekday[d.getDay()] + ' ' + month[d.getMonth()] + ' ' + d.getDate() + ', ' + d.getFullYear();
+            return {};
           }
+        },
+        month: {
+          type: String,
+          value: ''
+        },
+        dateString: {
+          type: String,
+          computed: '_getDateString(date, month)' 
+        },
+        categoryName: {
+          type: String,
+          value: ''
+        },
+        budget: {
+          type: Number,
+          value: null
         }
+      },
+      _getDateString: function(e) {
+        return weekday[this.date.getDay()] + ' ' + this.month + ' ' + this.date.getDate() + ', ' + this.date.getFullYear();
+      },
+      createCategory: function() {
+        var d = new Date();
+        this.fire('create-category', { categoryName: this.categoryName, budget: this.budget, year: this.date.getFullYear(), month: month[this.date.getMonth()] });
+        this.categoryName = this.budget = null;
+      },
+      _calcRemaining: function(budget, spent) {
+        return budget - spent;
       }
     });
   </script>

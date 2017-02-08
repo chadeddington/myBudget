@@ -5,7 +5,6 @@
 <link rel="import" href="../components/iron-pages/iron-pages.html">
 <link rel="import" href="budget-login.html">
 <link rel="import" href="budget-overview.html">
-<link rel="import" href="new-category.html">
 <!-- import style module  -->
 <link rel="import" href="bs-styles.html">
 
@@ -37,14 +36,13 @@
         data="{{routeData}}"
         tail="{{subroute}}"></app-route>
     <iron-selector selected="[[page]]" attr-for-selected="name" class="drawer-list" role="navigation">
-      <!--<nav class="pure-menu pure-menu-horizontal">
+      <nav class="pure-menu pure-menu-horizontal">
         <ul class="pure-menu-list">
           <li class="pure-menu-item"><a class="pure-menu-link" name="home" href="#/home">Overview</a></li>
-          <li class="pure-menu-item"><a class="pure-menu-link" name="login" href="#/login">Login</a></li>
           <li class="pure-menu-item"><a class="pure-menu-link" on-tap="signOut">Sign Out</a></li>
           <li class="pure-menu-item"><a class="pure-menu-link" on-tap="getItems">Get Items</a></li>
         </ul>
-      </nav>-->
+      </nav>
     </iron-selector>
     <iron-pages
         class='views'
@@ -52,7 +50,11 @@
         attr-for-selected="name"
         fallback-selection="view404"
         role="main">
-      <budget-overview name="home"></budget-overview>
+      <budget-overview 
+        name="home" 
+        items="[[items]]" 
+        date="[[date]]"
+        month="[[month]]"></budget-overview>
       <!--Log in View-->
       <budget-login name="login"></budget-login>
       <new-category name="new-category"></new-category>
@@ -73,6 +75,22 @@
     // Get a reference to the database service
     var database = firebase.database();
 
+    var date = new Date();
+    var month = [
+      'January',
+      'February',
+      'March',
+      'April',
+      'May',
+      'June',
+      'July',
+      'August',
+      'September',
+      'October',
+      'Novermber',
+      'December'
+    ]
+
     Polymer({
       is: 'budget-app',
       properties: {
@@ -81,10 +99,29 @@
           reflectToAttribute: true
         },
         items: {
+          type: Array,
+          value: function() {
+            return [];
+          },
+          notify: true
+        },
+        userId: {
+          type: String,
+          value: ''
+        },
+        date: {
           type: Object,
           value: function() {
-            return {};
-          }
+            return date;
+          },
+          notify: true
+        },
+        month: {
+          type: String,
+          value: function() {
+            return month[date.getMonth()];
+          },
+          notify: true
         }
       },
       observers: [
@@ -93,7 +130,8 @@
       listeners : {
       'register-user': 'register',
       'sign-in-user': 'signIn',
-      'iron-select': 'loginCheck'
+      'iron-select': 'loginCheck',
+      'create-category': 'createCategory'
       },
       _routePageChanged: function(page) {
         this.page = page || 'home';
@@ -109,7 +147,7 @@
         // Create user
         firebase.auth().createUserWithEmailAndPassword(email, password).then(function(data) {
           // For debugging
-          console.log("Successfully created user",data);
+          // console.log("Successfully created user",data);
           // Add user to the list of users
           firebase.database().ref('users/' + data.uid + '/userInfo').set({
             email: data.email,
@@ -178,13 +216,30 @@
       * Test function for pulling down user data
       */
       getItems: function() {
-        var userId = firebase.auth().currentUser.uid;
         var _this = this;
-      // Pull down their data
-      firebase.database().ref('/users/' + userId + '/userInfo').once('value').then(function(snapshot) {
-        console.log('snapshot', snapshot.val())
-        _this.firstName = snapshot.val().firstName;
-      });
+        var itemsRef = '/users/' + this.userId + '/' + this.date.getFullYear() + '/' + this.month;
+        // Pull down their data
+        firebase.database().ref(itemsRef).once('value').then(function(snapshot) {
+          var keys = Object.keys(snapshot.val());
+          var items = [];
+          // conver the object into an array of items
+          keys.forEach(function(key) {
+            items.push(snapshot.val()[key]);
+          })
+          _this.items = items;
+        });
+      },
+      /**
+      * Create a new category
+      */
+      createCategory: function(e) {
+        this.push('items', {category: e.detail.categoryName, budget: e.detail.budget, total: 0});
+        // Add category to firebase
+        firebase.database().ref('users/' + this.userId + '/' + e.detail.year + '/' + e.detail.month).push().set({
+          category: e.detail.categoryName,
+          budget: e.detail.budget,
+          total: 0
+        });
       }
     });
   </script>
