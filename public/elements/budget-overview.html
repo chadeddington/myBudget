@@ -9,30 +9,60 @@
       .row {
         margin-bottom: 50px;
       }
+      .delete-container {
+        text-align: right;
+      }
+      .delete-btn {
+        background-color: maroon;
+        color: white;
+      }
+      .form-container {
+        margin: auto;
+        margin-top: 100px;
+      }
+      .center-justify {
+        text-align: center;
+      }
+
     </style>
 
-    <div> 
+    <div class="center-justify"> 
       <h2 class='today'>Today is <span>[[dateString]]</span></h2>
     </div>
 
     <template is="dom-repeat" items="[[items]]">
-      <div class='row'>
-        <h3>[[item.category]]</h3>
-        <div><span>Budget: $</span>[[item.budget]]</div>
-        <div><span>Spent: $</span>[[item.total]]</div>
-        <div><span>Remaining: $</span>[[_calcRemaining(item.budget, item.total)]]</div>
+      <div class="row pure-g ">
+        <h3 class="pure-u-1">[[item.category]]</h3>
+        <div class='pure-u-3-5'>
+          <div><span>Budget: $</span>[[item.budget]]</div>
+          <div><span>Spent: $</span>[[item.total]]</div>
+          <div><span>Remaining: $</span>[[_calcRemaining(item.budget, item.total)]]</div>
+        </div>
+        <div class="pure-u-2-5 delete-container">
+          <button class="pure-button delete-btn">Delete</button>
+        </div>
       </div>
     </template>
 
-    <form class="pure-form pure-form-stacked form-group">
-      <fieldset>
-          <label for="name">Category Name:</label>
-          <input id="name" type="text" placeholder="Category Name" value="{{categoryName::input}}">
-          <label for="budget">Budget:</label>
-          <input id="budget" type="number" placeholder="0.00" value="{{budget::input}}">
-      </fieldset>
-    </form>
-    <button class="pure-button pure-button-primary" on-tap="createCategory">Create New Category</button>
+    <div class="form-container">
+      <form class="pure-form pure-form-aligned">
+        <fieldset>
+          <div class="pure-control-group">
+            <label for="category">Category Name:</label>
+            <input id="category" type="text" placeholder="Category Name" value="{{categoryName::input}}">
+          </div>
+          <div class="pure-control-group">
+            <label for="budget">Budget:</label>
+            <input id="budget" type="number" placeholder="0.00" value="{{budget::input}}">
+          </div>
+          <div class="pure-control-group">
+            <label></label>
+            <button class="pure-button pure-button-primary" type="button" on-tap="createCategory">Create New Category</button>
+          </div>
+        </fieldset>
+      </form>
+      
+    </div>
     
   </template>
   <script>

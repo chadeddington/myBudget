@@ -234,6 +234,7 @@
       */
       createCategory: function(e) {
         this.push('items', {category: e.detail.categoryName, budget: e.detail.budget, total: 0});
+        return;
         // Add category to firebase
         firebase.database().ref('users/' + this.userId + '/' + e.detail.year + '/' + e.detail.month).push().set({
           category: e.detail.categoryName,
