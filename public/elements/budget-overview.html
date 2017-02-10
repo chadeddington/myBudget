@@ -39,7 +39,7 @@
           <div><span>Remaining: $</span>[[_calcRemaining(item.budget, item.total)]]</div>
         </div>
         <div class="pure-u-2-5 delete-container">
-          <button class="pure-button delete-btn">Delete</button>
+          <button class="pure-button delete-btn" index="[[index]]" on-tap='deleteItem'>Delete</button>
         </div>
       </div>
     </template>
@@ -118,6 +118,10 @@
       },
       _calcRemaining: function(budget, spent) {
         return budget - spent;
+      },
+      deleteItem: function(e) {
+        if (!e.srcElement.index) return;
+        this.splice('items', e.srcElement.index, 1);
       }
     });
   </script>
