@@ -5,6 +5,7 @@
 <link rel="import" href="../components/iron-pages/iron-pages.html">
 <link rel="import" href="budget-login.html">
 <link rel="import" href="budget-overview.html">
+<link rel="import" href="budget-details.html">
 <!-- import style module  -->
 <link rel="import" href="bs-styles.html">
 
@@ -13,20 +14,10 @@
     <!-- consume the style module-->
     <style is="custom-style" include="bs-styles"></style>
     <style>
-      :host {
-        display: block;
-      }
-
       a:hover {
         cursor: pointer;
       }
-
-      .views {
-        margin-top: 50px;
-      }
     </style>
-    <!--Data Handler-->
-    <!--<budget-data user={{firebase}}></budget-data>-->
 
     <!--Route handler-->
     <app-location route="{{route}}" use-hash-as-path></app-location>
@@ -50,14 +41,17 @@
         attr-for-selected="name"
         fallback-selection="view404"
         role="main">
+      <!--Log in View-->
+      <budget-login name="login"></budget-login>
+      <!-- Main View-->
       <budget-overview 
         name="home" 
         items="[[items]]" 
         date="[[date]]"
         month="[[month]]"></budget-overview>
-      <!--Log in View-->
-      <budget-login name="login"></budget-login>
-      <new-category name="new-category"></new-category>
+
+      <budget-details id="details" name="details"></budget-details>
+      
       <p name="view404">404</p>
     </iron-pages>
   </template>
@@ -125,16 +119,38 @@
         }
       },
       observers: [
-        '_routePageChanged(routeData.page)',
+        '_routePageChanged(routeData.page, subroute.path)',
       ],
       listeners : {
       'register-user': 'register',
       'sign-in-user': 'signIn',
       'iron-select': 'loginCheck',
-      'create-category': 'createCategory'
+      'create-category': 'createCategory',
+      'delete-category': 'deleteCategory',
+      'view-details' : 'viewDetails'
       },
-      _routePageChanged: function(page) {
+      /**
+      * Set up value change listener on the data
+      */
+      getItems: function() {
+        var itemsRef = '/users/' + this.userId + '/' + this.date.getFullYear() + '/' + this.month;
+        // Pull down their data
+        firebase.database().ref(itemsRef).on('value', this.updateItems.bind(this));
+      },
+      _routePageChanged: function(page, tail) {
         this.page = page || 'home';
+
+        // Handle subroutes
+        if (tail && page === 'details') {
+           var index = tail.match(/[0-9]+/)[0];
+          if (this.items.length) {
+            // If the items are on the page, pass in the right one
+            this.$.details.item = this.items[index];
+          } else {
+            // If they are not on the page pull down the one 
+            this.$.details.index = index;
+          }  
+        }
       },
       /*
       * Register a new user
@@ -198,6 +214,9 @@
           console.log('There was an error logging you out');
         });
       },
+      /**
+      * Make sure user is logged in
+      */
       loginCheck: function(e) {
         //check if logged in
         firebase.auth().onAuthStateChanged(function(user) {
@@ -212,34 +231,46 @@
           }
         }.bind(this));
       },
-      /**
-      * Test function for pulling down user data
+      /** 
+      * Update the data
       */
-      getItems: function() {
-        var _this = this;
-        var itemsRef = '/users/' + this.userId + '/' + this.date.getFullYear() + '/' + this.month;
-        // Pull down their data
-        firebase.database().ref(itemsRef).once('value').then(function(snapshot) {
-          var keys = Object.keys(snapshot.val());
-          var items = [];
-          // conver the object into an array of items
-          keys.forEach(function(key) {
-            items.push(snapshot.val()[key]);
-          })
-          _this.items = items;
-        });
+      updateItems: function(snapshot) {
+        var keys = Object.keys(snapshot.val());
+        var items = [];
+        // convert the object into an array of items
+        items = keys.map(function(item) {
+          var obj = snapshot.val()[item];
+          obj.id = item;
+          return obj;
+        })
+        this.items = items;
+
+        if (this.page === 'details') {
+         this.$.details.item = items[this.subroute.path.match(/[0-9]+/)[0]] 
+        }
       },
       /**
       * Create a new category
       */
       createCategory: function(e) {
-        this.push('items', {category: e.detail.categoryName, budget: e.detail.budget, total: 0});
-        return;
         // Add category to firebase
         firebase.database().ref('users/' + this.userId + '/' + e.detail.year + '/' + e.detail.month).push().set({
           category: e.detail.categoryName,
           budget: e.detail.budget,
           total: 0
+        });
+      },
+      /**
+      * Detele a category
+      */
+      deleteCategory: function(e) {
+        var id = e.detail.id;
+        var catRef = firebase.database().ref('users/' + this.userId + '/' + e.detail.year + '/' + e.detail.month + '/' + id);
+        catRef.remove().then(function() {
+          // console.log("Remove succeeded.")
+        })
+        .catch(function(error) {
+          console.log("Remove failed: " + error.message)
         });
       }
     });

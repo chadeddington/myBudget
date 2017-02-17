@@ -1,0 +1,60 @@
+<link rel="import" href="bs-styles.html">
+<dom-module id="budget-details">
+  <style is="custom-style" include="bs-styles"></style>
+  <template>
+    <style>
+      :host {
+        display: block;
+      }
+      .title {
+        text-align: center;
+      }
+
+      h1, h2, h3 {
+        font-weight: 300
+      }
+      #desc, #amount, #add {
+        width: 90px;
+      }
+    </style>
+
+    <h1 class="title">[[item.category]]</h1>
+    <label>Budget: </label> <string>[[item.budget]]</strong>
+    <h2>Expenses</h2>
+    <form class="pure-form pure-form-aligned">
+      <fieldset>
+        <div class="pure-control-group">
+          <label id="desc" for="description">Description: </label>
+          <input type="text" name="description" value="[[description::input]]">
+        </div>
+        <div class="pure-control-group">
+          <label id="amount" for="amount">Amount: </label>
+          <input type="number" name="amount" value="[[amount::input]]">
+        </div>
+        <div class="pure-control-group">
+            <label id="add"></label>
+            <button class="pure-button pure-button-primary category-input" type="button" >Add</button>
+          </div>
+      </fieldset>
+    </form>
+    
+  </template>
+  <script>
+    Polymer({
+      is: 'budget-details',
+      properties: {
+        item: {
+          type: Object,
+          value: function() {
+            return {}
+          }
+        },
+        index: {
+          type: Number,
+          value: null
+        }
+      }
+    });
+  </script>
+</dom-module>
+

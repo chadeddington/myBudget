@@ -1,0 +1,94 @@
+<link rel="import" href="bs-styles.html">
+<link rel="import" href="budget-bar.html">
+<link rel="import" href="../components/paper-material/paper-material.html">
+<dom-module id="budget-card">
+  <style is="custom-style" include="bs-styles"></style>
+  <template>
+    <style>
+     .delete-container {
+        text-align: right;
+      }
+      .delete-btn {
+        background-color: red;
+        color: white;
+        font-size: 12px;
+      }
+      .form-container {
+        margin: auto;
+        margin-top: 10px;
+      }
+     
+      .category-name {
+        font-size: 24px;
+        margin-bottom: 20px;
+      }
+      .remaining {
+        font-size: 1.2em;
+        margin-top: 5px;
+        font-weight: 100;
+      }
+      paper-material {
+        background-color: white;
+        padding: 10px;
+        margin: 20px 0px;
+      }
+
+      paper-material:hover {
+        cursor: pointer;
+        transform: scale(1.01, 1.01);
+      }
+
+      h1,h2,h3,h4 {
+        font-weight: 300;
+      }
+    </style>
+    <paper-material index$="[[index]]" on-tap="viewDetails">
+      <div class="row pure-g ">
+        <span class="pure-u-4-5 category-name">[[item.category]]</span>
+        <div class="pure-u-1-5 delete-container">
+          <button class="pure-button delete-btn" index="[[index]]" on-tap='deleteItem'>✕</button>
+        </div>
+        <div class='pure-u-1'>
+          <budget-bar item="[[item]]"></budget-bar>
+          <div class="remaining">Remaining: <strong>[[_calcRemaining(item.budget, item.total)]]</strong></div>
+        </div>
+      </div>
+    </paper-material>
+  </template>
+  <script>
+    Polymer({
+      is: 'budget-card',
+      properties: {
+        item: {
+          type: Object,
+          value: function() {
+            return {};
+          }
+        },
+        date: {
+          type: Object,
+          value: function() {
+            return {};
+          }
+        },
+        month: {
+          type: String,
+          value: ''
+        }
+      },
+      _calcRemaining: function(budget, spent) {
+        return '$' + (budget - spent);
+      },
+            
+      deleteItem: function(e) {
+        e.stopPropagation();
+        this.fire('delete-category', {id: this.item.id,  year: this.date.getFullYear(), month: this.month});
+      },
+      viewDetails: function(e) {
+        // this.fire('view-details', {index: this.index} )
+        window.location.replace(window.location.origin + "/#/details/" + this.index)
+      }
+
+    });
+  </script>
+</dom-module>

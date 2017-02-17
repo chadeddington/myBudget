@@ -1,0 +1,69 @@
+
+<dom-module id="budget-bar">
+  <template>
+    <style>
+      .graph {
+        width: 100%;
+        height: 30px;
+        border-radius: 8px;
+        background-color: #7f8084;
+        color: white;
+        text-align: right;
+      }
+      #fill {
+        height: 100%;
+        background-color: #7BA332;
+        border-radius: 8px;
+        width: 1%;
+        text-align: left;
+        color: white;
+        transition: width 2s;
+      }
+      .budget {
+        position: relative;
+        top: -23px;
+        right: 6px;
+      }
+      .total {
+        position: relative;
+        top: 6px;
+        left: 6px;
+      }
+    </style>
+
+    <div class="graph">
+      <div id="fill"><span class="total">[[getTotal(item.total)]]</span></div>
+      <span class="budget">[[getBudget(item.budget)]]</span>
+    </div>
+    
+  </template>
+  <script>
+    Polymer({
+      is: 'budget-bar',
+      properties: {
+        item: {
+          type: Object,
+          value: function() {
+            return {}
+          }
+        }
+      },
+      observers: [
+        'updateFill(item.*)'
+      ],
+      updateFill: function(e) {
+        // This needs to be set later for animation
+        this.async(function() {
+          var diff = this.item.total / this.item.budget * 100;
+          this.$.fill.style.width = diff + '%';
+        }, 250)
+      },
+      getBudget: function(budget) {
+        return '$' + budget;
+      },
+      getTotal: function(total) {
+        return '$' + total;
+      }
+    });
+  </script>
+</dom-module>

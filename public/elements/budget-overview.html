@@ -1,67 +1,50 @@
 <link rel="import" href="bs-styles.html">
+<link rel="import" href="budget-card.html">
 <dom-module id="budget-overview">
   <template>
     <style is="custom-style" include="bs-styles"></style>
     <style>
       .today {
-        font-weight: 100;
-      }
-      .row {
         margin-bottom: 50px;
       }
-      .delete-container {
-        text-align: right;
-      }
-      .delete-btn {
-        background-color: maroon;
-        color: white;
-      }
-      .form-container {
-        margin: auto;
-        margin-top: 100px;
-      }
-      .center-justify {
+       .center-justify {
         text-align: center;
       }
-
+      .category-input {
+        width: 120px;
+      }
+      h1,h2,h3,h4 {
+        font-weight: 300;
+      }
     </style>
 
     <div class="center-justify"> 
-      <h2 class='today'>Today is <span>[[dateString]]</span></h2>
+      <h1><span>[[month]]</span> Budget</h1>
+      <h3 class='today'>[[dateString]]</h3>
     </div>
 
     <template is="dom-repeat" items="[[items]]">
-      <div class="row pure-g ">
-        <h3 class="pure-u-1">[[item.category]]</h3>
-        <div class='pure-u-3-5'>
-          <div><span>Budget: $</span>[[item.budget]]</div>
-          <div><span>Spent: $</span>[[item.total]]</div>
-          <div><span>Remaining: $</span>[[_calcRemaining(item.budget, item.total)]]</div>
-        </div>
-        <div class="pure-u-2-5 delete-container">
-          <button class="pure-button delete-btn" index="[[index]]" on-tap='deleteItem'>Delete</button>
-        </div>
-      </div>
+      <budget-card item="[[item]]" index="[[index]]" date="[[date]]" month="[[month]]"></budget-card>
     </template>
 
     <div class="form-container">
+      <h2>Add a new category</h2>
       <form class="pure-form pure-form-aligned">
         <fieldset>
           <div class="pure-control-group">
             <label for="category">Category Name:</label>
-            <input id="category" type="text" placeholder="Category Name" value="{{categoryName::input}}">
+            <input id="category" class="category-input" type="text" placeholder="Category" value="{{categoryName::input}}">
           </div>
           <div class="pure-control-group">
             <label for="budget">Budget:</label>
-            <input id="budget" type="number" placeholder="0.00" value="{{budget::input}}">
+            <input id="budget" class="category-input" type="number" placeholder="0.00" value="{{budget::input}}">
           </div>
           <div class="pure-control-group">
             <label></label>
-            <button class="pure-button pure-button-primary" type="button" on-tap="createCategory">Create New Category</button>
+            <button class="pure-button pure-button-primary category-input" type="button" on-tap="createCategory">Add</button>
           </div>
         </fieldset>
       </form>
-      
     </div>
     
   </template>
@@ -109,19 +92,12 @@
         }
       },
       _getDateString: function(e) {
-        return weekday[this.date.getDay()] + ' ' + this.month + ' ' + this.date.getDate() + ', ' + this.date.getFullYear();
+        return 'Today is ' + weekday[this.date.getDay()] + ' the ' + this.date.getDate();
       },
       createCategory: function() {
         var d = new Date();
-        this.fire('create-category', { categoryName: this.categoryName, budget: this.budget, year: this.date.getFullYear(), month: month[this.date.getMonth()] });
+        this.fire('create-category', { categoryName: this.categoryName, budget: this.budget, year: this.date.getFullYear(), month: this.month });
         this.categoryName = this.budget = null;
-      },
-      _calcRemaining: function(budget, spent) {
-        return budget - spent;
-      },
-      deleteItem: function(e) {
-        if (!e.srcElement.index) return;
-        this.splice('items', e.srcElement.index, 1);
       }
     });
   </script>
