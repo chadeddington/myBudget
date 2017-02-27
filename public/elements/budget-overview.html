@@ -92,7 +92,7 @@
         }
       },
       _getDateString: function(e) {
-        return 'Today is ' + weekday[this.date.getDay()] + ' the ' + this.date.getDate();
+        return weekday[this.date.getDay()] + ' ' + this.month + ' ' + this.date.getDate();
       },
       createCategory: function() {
         var d = new Date();

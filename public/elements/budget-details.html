@@ -16,27 +16,60 @@
       #desc, #amount, #add {
         width: 90px;
       }
+      #details-card {
+        padding: 20px;
+        margin-top: 50px;
+      }
+      table {
+        width: 100%;
+      }
+      tr:nth-child(even) {
+          background-color: #dddddd;
+      }
     </style>
+    <paper-material id="details-card" elevation="3">
+      <h1 class="title">[[item.category]]<span> Details</span></h1>
 
-    <h1 class="title">[[item.category]]</h1>
-    <label>Budget: </label> <string>[[item.budget]]</strong>
-    <h2>Expenses</h2>
-    <form class="pure-form pure-form-aligned">
-      <fieldset>
-        <div class="pure-control-group">
-          <label id="desc" for="description">Description: </label>
-          <input type="text" name="description" value="[[description::input]]">
-        </div>
-        <div class="pure-control-group">
-          <label id="amount" for="amount">Amount: </label>
-          <input type="number" name="amount" value="[[amount::input]]">
-        </div>
-        <div class="pure-control-group">
-            <label id="add"></label>
-            <button class="pure-button pure-button-primary category-input" type="button" >Add</button>
+      <table class="pure-table">
+        <thead>
+          <tr>
+              <th>#</th>
+              <th>Description</th>
+              <th>Amount</th>
+          </tr>
+          <tbody>
+            <template is="dom-repeat" items="[[item.expenses]]">
+              <tr>
+                <td>[[_getEntry(index)]]</td>
+                <td>[[item.description]]</td>
+                <td><span>$</span>[[item.amount]]</td>
+              </tr>
+            </template>
+          </tbody>
+      </thead>
+      </table>
+      <h3>Budget: <strong><span>$</span>[[item.budget]]</strong></h3>
+      <h3>Spent: <strong><span>$</span>[[item.total]]</strong></h3>
+      <hr>
+      <h3>Remaining: <strong><span>$</span>[[_calcRemaining(item.*)]]</strong></h3>
+
+      <form class="pure-form pure-form-aligned">
+        <fieldset>
+          <div class="pure-control-group">
+            <label id="desc" for="description">Description: </label>
+            <input type="text" name="description" value="{{description::input}}">
           </div>
-      </fieldset>
-    </form>
+          <div class="pure-control-group">
+            <label id="amount" for="amount">Amount: </label>
+            <input type="number" name="amount" value="{{amount::input}}">
+          </div>
+          <div class="pure-control-group">
+              <label id="add"></label>
+              <button class="pure-button pure-button-primary category-input" type="button" on-tap="addExpense">Add</button>
+            </div>
+        </fieldset>
+      </form>
+    </paper-material>
     
   </template>
   <script>
@@ -49,10 +82,31 @@
             return {}
           }
         },
+        description: {
+          type: String,
+          value: ''
+        },
+        amount: {
+          type: String,
+          value: ''
+        },
         index: {
           type: Number,
           value: null
-        }
+        },
+      },
+      addExpense: function() {
+        var description = this.description;
+        var amount = this.amount;
+        this.description = '';
+        this.amount = '';
+        this.fire('add-expense', {itemId: this.item.id, itemIndex: this.index, desc: description, amount: amount})
+      },
+      _getEntry: function(index) {
+        return index + 1;
+      },
+      _calcRemaining: function(item) {
+        return this.item.budget - this.item.total;
       }
     });
   </script>

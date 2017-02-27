@@ -5,6 +5,9 @@
   <style is="custom-style" include="bs-styles"></style>
   <template>
     <style>
+      :host {
+        color: black;
+      }
      .delete-container {
         text-align: right;
       }
@@ -24,7 +27,7 @@
       }
       .remaining {
         font-size: 1.2em;
-        margin-top: 5px;
+        margin-top: 15px;
         font-weight: 100;
       }
       paper-material {
@@ -42,7 +45,7 @@
         font-weight: 300;
       }
     </style>
-    <paper-material index$="[[index]]" on-tap="viewDetails">
+    <paper-material index$="[[index]]" on-tap="viewDetails" elevation="3">
       <div class="row pure-g ">
         <span class="pure-u-4-5 category-name">[[item.category]]</span>
         <div class="pure-u-1-5 delete-container">
