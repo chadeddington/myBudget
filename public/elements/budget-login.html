@@ -22,15 +22,15 @@
     </form>    
 
     <!-- Uncomment if we want to allow users to register -->
-    <!--<div class="pure-form pure-form-stacked">
+    <form class="pure-form pure-form-stacked form-group" on-submit="register">
       <p>Create An Account</p>
       <input type="text" value="{{firstName::input}}" placeholder="First name">
       <input type="text" value="{{lastName::input}}" placeholder="Last name">
-      <input type="text" value="{{email::input}}" placeholder="Enter your email address">
+      <input type="text" value="{{email::input}}" placeholder="Email Address">
       <input type="password" value="{{pass1::input}}" placeholder="Enter a password">
       <input type="password" value="{{pass2::input}}" placeholder="Confirm password">
-      <button class="pure-button" on-tap="register">Sign Up</button>
-    </div>  -->
+      <button class="pure-button pure-button-primary">Sign Up</button>
+    </form>  
   </template>
   <script>
     Polymer({
