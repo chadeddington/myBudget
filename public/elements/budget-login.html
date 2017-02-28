@@ -7,9 +7,16 @@
     <style is="custom-style" include="bs-styles"></style>
     <style>
       .form-group {
-        max-width: 300px;
         margin: 0px auto;
         margin-top: 50px;
+        text-align: center;
+        width: 100%;
+        max-width: 300px;
+      }
+
+      .form-group input {
+        margin: auto;
+        width: 100%;
       }
 
     </style>
@@ -29,7 +36,7 @@
       <input type="text" value="{{email::input}}" placeholder="Email Address">
       <input type="password" value="{{pass1::input}}" placeholder="Enter a password">
       <input type="password" value="{{pass2::input}}" placeholder="Confirm password">
-      <button class="pure-button pure-button-primary">Sign Up</button>
+      <input class="pure-button pure-button-primary" value="Sign Up">
     </form>  
   </template>
   <script>
