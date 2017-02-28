@@ -14,8 +14,47 @@
     <!-- consume the style module-->
     <style is="custom-style" include="bs-styles"></style>
     <style>
+      :host {
+        flex-grow: 1;
+        background-color: white;
+      }
+
+      .pad {
+        padding-top: 70px;
+      }
+
+      .nav-list {
+        display: flex;
+        justify-content: space-between;
+        padding: 0px;
+      }
+
       a:hover {
         cursor: pointer;
+      }
+
+      paper-material {
+        background-color: white;
+        padding: 25px;
+        height: 100%;
+      }
+
+      iron-selector {
+        width: 100%;
+        max-width: 650px;
+        position: fixed;
+        background-color: white;
+        z-index: 100;
+        top: 0px;
+        height: 70px;
+        border-bottom: 2px solid #7BA332;
+      }
+
+      @media (min-width: 650px) {
+        .pad {
+          padding: 40px;
+          padding-top: 70px;
+        }
       }
     </style>
 
@@ -26,33 +65,39 @@
         pattern="/:page"
         data="{{routeData}}"
         tail="{{subroute}}"></app-route>
+    
     <iron-selector selected="[[page]]" attr-for-selected="name" class="drawer-list" role="navigation">
       <nav class="pure-menu pure-menu-horizontal">
-        <ul class="pure-menu-list">
+        <ul class="nav-list">
           <li class="pure-menu-item"><a class="pure-menu-link" name="home" href="#/home">Overview</a></li>
           <li class="pure-menu-item"><a class="pure-menu-link" on-tap="signOut">Sign Out</a></li>
         </ul>
       </nav>
     </iron-selector>
-    <iron-pages
-        class='views'
-        selected="[[page]]"
-        attr-for-selected="name"
-        fallback-selection="view404"
-        role="main">
-      <!--Log in View-->
-      <budget-login name="login"></budget-login>
-      <!-- Main View-->
-      <budget-overview 
-        name="home" 
-        items="[[items]]" 
-        date="{{date}}"
-        month="{{month}}"></budget-overview>
 
-      <budget-details id="details" name="details"></budget-details>
-      
-      <p name="view404">404</p>
-    </iron-pages>
+    <div class="pad">
+      <iron-pages
+          class='views'
+          selected="[[page]]"
+          attr-for-selected="name"
+          fallback-selection="view404"
+          role="main">
+        
+          <!--Log in View-->
+          <budget-login name="login"></budget-login>
+          <!-- Main View-->
+          <budget-overview 
+            name="home" 
+            items="[[items]]" 
+            date="{{date}}"
+            month="{{month}}"></budget-overview>
+
+          <budget-details id="details" name="details"></budget-details>
+          
+          <p name="view404">404</p>
+        
+      </iron-pages>
+    </div>
   </template>
   <script>
     // Initialize Firebase
