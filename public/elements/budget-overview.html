@@ -16,33 +16,29 @@
       h1,h2,h3,h4 {
         font-weight: 300;
       }
+      .add-category {
+        text-align: center;
+      }
     </style>
 
     <div class="center-justify"> 
       <h1><span>[[month]]</span> Budget</h1>
       <h3 class='today'>[[dateString]]</h3>
     </div>
+    <hr>
 
     <template is="dom-repeat" items="[[items]]">
       <budget-card item="[[item]]" index="[[index]]" date="[[date]]" month="[[month]]"></budget-card>
+      <hr>
     </template>
 
-    <div class="form-container">
+    <div class="add-category">
       <h2>Add a new category</h2>
-      <form class="pure-form pure-form-aligned">
+      <form class="pure-form">
         <fieldset>
-          <div class="pure-control-group">
-            <label for="category">Category Name:</label>
-            <input id="category" class="category-input" type="text" placeholder="Category" value="{{categoryName::input}}">
-          </div>
-          <div class="pure-control-group">
-            <label for="budget">Budget:</label>
-            <input id="budget" class="category-input" type="number" placeholder="0.00" value="{{budget::input}}">
-          </div>
-          <div class="pure-control-group">
-            <label></label>
-            <button class="pure-button pure-button-primary category-input" type="button" on-tap="createCategory">Add</button>
-          </div>
+          <input id="category" class="category-input" type="text" placeholder="Category" value="{{categoryName::input}}">
+          <input id="budget" class="category-input" type="number" placeholder="0.00" value="{{budget::input}}">
+          <input class="pure-button pure-button-primary category-input" type="button" on-tap="createCategory" value="Add">
         </fieldset>
       </form>
     </div>

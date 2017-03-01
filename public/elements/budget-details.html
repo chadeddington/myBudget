@@ -5,14 +5,18 @@
     <style>
       :host {
         display: block;
-        padding: 0 5px;
       }
+
       .title {
         text-align: center;
       }
 
-      h1, h2, h3 {
+      h1, h2 {
         font-weight: 300
+      }
+
+      .pure-g {
+        padding: 0 5px;
       }
 
       .expenses {
@@ -22,6 +26,24 @@
 
       .btn {
         text-align: center;
+      }
+
+      .delete-btn {
+        background-color: red;
+        color: white;
+        font-size: 12px;
+      }
+
+      .budget {
+        letter-spacing: 1px;
+      }
+
+      .budget-wrapper {
+        background-color: #EEEEEE;
+      }
+
+      .total {
+        border-bottom: 1px solid grey;
       }
 
       input {
@@ -34,12 +56,15 @@
 
     </style>
       <h1 class="title">[[item.category]]<span> Details</span></h1>
-      <div class="pure-g">
+
+      <!-- Budget -->
+      <div class="pure-g budget-wrapper">
         <div class="pure-u-12-24"><h3>Budget</h3></div>
-        <div class="pure-u-6-24"><h3><span>$</span>[[item.total]]</h3></div>
+        <div class="pure-u-6-24 budget"><h3><span>$</span>[[item.budget]]</h3></div>
         <div class="pure-u-6-24"></div>
       </div>
       
+      <!-- List Expenses -->
       <template is="dom-repeat" items="[[item.expenses]]">
         <div class="pure-g expenses">
           <div class="pure-u-12-24">
@@ -49,11 +74,24 @@
             <span>-$</span>[[item.amount]]
           </div>
           <div class="pure-u-6-24 btn">
-            <button class="pure-button category-input">Edit</button>
+            <button class="pure-button delete-btn" index="[[index]]" on-tap='deleteExpense'>✕</button>
           </div>
         </div>
       </template>
-      <hr>
+
+      <!-- Totals -->
+      <div class="pure-g budget-wrapper total">
+        <div class="pure-u-12-24"><h3>Total Spent</h3></div>
+        <div class="pure-u-6-24 budget"><h3><span>-$</span>[[item.total]]</h3></div>
+        <div class="pure-u-6-24"></div>
+      </div>
+      <div class="pure-g budget-wrapper">
+        <div class="pure-u-12-24"><h3>Remaining</h3></div>
+        <div class="pure-u-6-24 budget"><h3><span>$</span>[[_calcRemaining(item.*)]]</h3></div>
+        <div class="pure-u-6-24"></div>
+      </div>
+
+      <!-- Add Expense -->
       <div class="pure-g expenses">
         <div class="pure-u-12-24">
           <input type="text" name="description" placeholder="Description" value="{{description::input}}">  
@@ -65,7 +103,6 @@
           <button class="pure-button pure-button-primary" on-tap="addExpense">Add</button>  
         </div>
       </div>
-    
   </template>
   <script>
     Polymer({
@@ -93,15 +130,22 @@
       addExpense: function() {
         var description = this.description;
         var amount = this.amount;
+        // Reset
         this.description = '';
         this.amount = '';
         this.fire('add-expense', {itemId: this.item.id, itemIndex: this.index, desc: description, amount: amount})
+      },
+      deleteExpense: function(e) {
+        var index = e.srcElement.index;
+        var expense = this.item.expenses[index];
+        var newTotal = parseFloat(this.item.total) - parseFloat(expense.amount);
+        this.fire('delete-expense', { itemId: this.item.id, expId: expense.id, newTotal: newTotal })
       },
       _getEntry: function(index) {
         return index + 1;
       },
       _calcRemaining: function(item) {
-        return this.item.budget - this.item.total;
+        return (this.item.budget - this.item.total).toFixed(2) || '';
       }
     });
   </script>

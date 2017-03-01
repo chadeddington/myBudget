@@ -1,6 +1,5 @@
 <link rel="import" href="bs-styles.html">
 <link rel="import" href="budget-bar.html">
-<link rel="import" href="../components/paper-material/paper-material.html">
 <dom-module id="budget-card">
   <style is="custom-style" include="bs-styles"></style>
   <template>
@@ -30,22 +29,22 @@
         margin-top: 15px;
         font-weight: 100;
       }
-      paper-material {
+      .card {
         background-color: white;
         padding: 10px;
         margin: 20px 0px;
       }
 
-      paper-material:hover {
+      .card:hover {
         cursor: pointer;
-        transform: scale(1.01, 1.01);
+        transform: scale(1.02, 1.02);
       }
 
       h1,h2,h3,h4 {
         font-weight: 300;
       }
     </style>
-    <paper-material index$="[[index]]" on-tap="viewDetails" elevation="3">
+    <div class="card" index$="[[index]]" on-tap="viewDetails" elevation="0">
       <div class="row pure-g ">
         <span class="pure-u-4-5 category-name">[[item.category]]</span>
         <div class="pure-u-1-5 delete-container">
@@ -56,7 +55,7 @@
           <div class="remaining">Remaining: <strong>[[_calcRemaining(item.budget, item.total)]]</strong></div>
         </div>
       </div>
-    </paper-material>
+    </div>
   </template>
   <script>
     Polymer({

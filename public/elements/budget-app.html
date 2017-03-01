@@ -34,12 +34,6 @@
         cursor: pointer;
       }
 
-      paper-material {
-        background-color: white;
-        padding: 25px;
-        height: 100%;
-      }
-
       iron-selector {
         width: 100%;
         max-width: 650px;
@@ -172,7 +166,8 @@
       'create-category': 'createCategory',
       'delete-category': 'deleteCategory',
       'view-details' : 'viewDetails',
-      'add-expense' : 'addExpense'
+      'add-expense' : 'addExpense',
+      'delete-expense': 'deleteExpense'
       },
       ready: function() {
         if (!this.routeData.page) window.location.replace(window.location.origin + "/#/home");
@@ -297,6 +292,10 @@
       * Update the data
       */
       updateItems: function(snapshot) {
+        if (!snapshot.val()) {
+          this.items = [];
+          return;
+        }
         var keys = Object.keys(snapshot.val());
         var items = [];
         var expenses = [];
@@ -306,7 +305,9 @@
           obj.id = item;
           if (obj.expenses) {
             expenses = Object.keys(obj.expenses).map(function(expKey) {
-              return obj.expenses[expKey];
+              var exp = obj.expenses[expKey];
+              exp.id = expKey;
+              return exp;
             });
             obj.expenses = expenses;
           }
@@ -343,19 +344,33 @@
         });
       },
       /**
-       * Add an expense to an item
-       */
+      * Add an expense to an item
+      */
       addExpense: function(e) {
-        var newTotal = parseInt(this.items[e.detail.itemIndex].total) + parseInt(e.detail.amount);
+        var newTotal = parseFloat(this.items[e.detail.itemIndex].total) + parseFloat(e.detail.amount);
         console.log('Expense: ', e.detail.desc)
         firebase.database()
           .ref('users/' + this.userId + '/' + this.date.getFullYear() + '/' + this.month + '/' + e.detail.itemId + '/expenses').push().set({
           description: e.detail.desc,
-          amount: e.detail.amount
+          amount: parseFloat(e.detail.amount).toFixed(2)
         });
         firebase.database()
           .ref('users/' + this.userId + '/' + this.date.getFullYear() + '/' + this.month + '/' + e.detail.itemId).update({
-            total: newTotal
+            total: newTotal.toFixed(2)
+        });
+      },
+      deleteExpense: function(e) {
+        firebase.database()
+          .ref('users/' + this.userId + '/' + this.date.getFullYear() + '/' + this.month + '/' + e.detail.itemId + '/expenses/' + e.detail.expId)
+          .remove().then(function() {
+          })
+          .catch(function(error) {
+            console.log('Remove expenses: ', error.message);
+          })
+
+        firebase.database()
+          .ref('users/' + this.userId + '/' + this.date.getFullYear() + '/' + this.month + '/' + e.detail.itemId).update({
+            total: e.detail.newTotal.toFixed(2)
         });
       }
     });
