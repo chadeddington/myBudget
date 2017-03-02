@@ -19,6 +19,12 @@
       .add-category {
         text-align: center;
       }
+      @media (max-width: 375px) {
+        .category-input {
+          margin-bottom: 5px;
+          width: 80%;
+        }
+      }
     </style>
 
     <div class="center-justify"> 
@@ -34,11 +40,11 @@
 
     <div class="add-category">
       <h2>Add a new category</h2>
-      <form class="pure-form">
+      <form class="pure-form" on-submit='createCategory'>
         <fieldset>
           <input id="category" class="category-input" type="text" placeholder="Category" value="{{categoryName::input}}">
           <input id="budget" class="category-input" type="number" placeholder="0.00" value="{{budget::input}}">
-          <input class="pure-button pure-button-primary category-input" type="button" on-tap="createCategory" value="Add">
+          <input class="pure-button pure-button-primary category-input" type="submit" on-tap="createCategory" value="Add">
         </fieldset>
       </form>
     </div>
@@ -90,7 +96,8 @@
       _getDateString: function(e) {
         return weekday[this.date.getDay()] + ' ' + this.month + ' ' + this.date.getDate();
       },
-      createCategory: function() {
+      createCategory: function(e) {
+        e.preventDefault();
         var d = new Date();
         this.fire('create-category', { categoryName: this.categoryName, budget: this.budget, year: this.date.getFullYear(), month: this.month });
         this.categoryName = this.budget = null;

@@ -55,6 +55,10 @@
         // This needs to be set later for animation
         this.async(function() {
           var diff = this.item.total / this.item.budget * 100;
+          if (diff > 100) {
+            diff = 100;
+            this.$.fill.style.backgroundColor = "red";
+          }
           this.$.fill.style.width = diff + '%';
         }, 250)
       },

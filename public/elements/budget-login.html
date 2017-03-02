@@ -86,6 +86,8 @@
       signin: function(e) {
         e.preventDefault();
         this.fire('sign-in-user', {email: this.userName, password: this.userPass});
+        this.userName = '';
+        this.userPass = '';
       }
     });
   </script>

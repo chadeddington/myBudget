@@ -92,17 +92,19 @@
       </div>
 
       <!-- Add Expense -->
-      <div class="pure-g expenses">
-        <div class="pure-u-12-24">
-          <input type="text" name="description" placeholder="Description" value="{{description::input}}">  
+      <form on-submit="addExpense">
+        <div class="pure-g expenses">
+          <div class="pure-u-12-24">
+            <input type="text" name="description" placeholder="Description" value="{{description::input}}">  
+          </div>
+          <div class="pure-u-6-24">
+            <input type="number" name="amount" placeholder="Amount" value="{{amount::input}}">
+          </div>
+          <div class="pure-u-6-24 btn">
+            <input class="pure-button pure-button-primary" type="submit" value="Add"> 
+          </div>
         </div>
-        <div class="pure-u-6-24">
-          <input type="number" name="amount" placeholder="Amount" value="{{amount::input}}">
-        </div>
-        <div class="pure-u-6-24 btn">
-          <button class="pure-button pure-button-primary" on-tap="addExpense">Add</button>  
-        </div>
-      </div>
+      </form>
   </template>
   <script>
     Polymer({
@@ -127,7 +129,8 @@
           value: null
         },
       },
-      addExpense: function() {
+      addExpense: function(e) {
+        e.preventDefault();
         var description = this.description;
         var amount = this.amount;
         // Reset

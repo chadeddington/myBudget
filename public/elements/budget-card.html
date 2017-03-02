@@ -24,10 +24,16 @@
         font-size: 24px;
         margin-bottom: 20px;
       }
+      .budget-details {
+        display: flex;
+        justify-content: space-between;
+        margin-top: 15px;
+        align-items: center;
+      }
       .remaining {
         font-size: 1.2em;
-        margin-top: 15px;
         font-weight: 100;
+        display: inline;
       }
       .card {
         background-color: white;
@@ -37,14 +43,13 @@
 
       .card:hover {
         cursor: pointer;
-        transform: scale(1.02, 1.02);
       }
 
       h1,h2,h3,h4 {
         font-weight: 300;
       }
     </style>
-    <div class="card" index$="[[index]]" on-tap="viewDetails" elevation="0">
+    <div class="card" index$="[[index]]" elevation="0">
       <div class="row pure-g ">
         <span class="pure-u-4-5 category-name">[[item.category]]</span>
         <div class="pure-u-1-5 delete-container">
@@ -52,7 +57,10 @@
         </div>
         <div class='pure-u-1'>
           <budget-bar item="[[item]]"></budget-bar>
-          <div class="remaining">Remaining: <strong>[[_calcRemaining(item.budget, item.total)]]</strong></div>
+          <div class="budget-details">
+            <div class="remaining">Remaining: <strong>[[_calcRemaining(item.budget, item.total)]]</strong></div>
+            <button class="flex pure-button pure-button-primary" on-tap="viewDetails">Details</button>
+          </div>
         </div>
       </div>
     </div>
