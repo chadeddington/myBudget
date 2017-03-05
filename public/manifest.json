@@ -1,0 +1,19 @@
+{
+  "short_name": "myBudget",
+  "name": "myBudget",
+  "icons": [
+    {
+      "src": "favicon-32x932.png",
+      "sizes": "32x32",
+      "type": "image/png"
+    },
+    {
+      "src": "favicon-96x96.png",
+      "sizes": "96x96",
+      "type": "image/png"
+    },
+  ],
+  "start_url": "/index.html",
+  "display": "fullscreen",
+  "orientation": "portrait"
+}

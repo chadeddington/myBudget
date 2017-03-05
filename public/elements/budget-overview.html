@@ -1,5 +1,6 @@
 <link rel="import" href="bs-styles.html">
 <link rel="import" href="budget-card.html">
+<link rel="import" href="budget-line.html">
 <dom-module id="budget-overview">
   <template>
     <style is="custom-style" include="bs-styles"></style>
@@ -8,6 +9,10 @@
         margin-bottom: 50px;
       }
        .center-justify {
+        text-align: center;
+      }
+      .overall {
+        margin-bottom: 50px;
         text-align: center;
       }
       .category-input {
@@ -31,6 +36,13 @@
       <h1><span>[[month]]</span> Budget</h1>
       <h3 class='today'>[[dateString]]</h3>
     </div>
+    
+    <div class='overall'>
+      <h3>Overview</h3>
+      <template is="dom-repeat" items="[[items]]">
+        <budget-line item='[[item]]'></budget-line>
+      </template>
+    </div>
     <hr>
 
     <template is="dom-repeat" items="[[items]]">
@@ -42,8 +54,8 @@
       <h2>Add a new category</h2>
       <form class="pure-form" on-submit='createCategory'>
         <fieldset>
-          <input id="category" class="category-input" type="text" placeholder="Category" value="{{categoryName::input}}">
-          <input id="budget" class="category-input" type="number" placeholder="0.00" value="{{budget::input}}">
+          <input id="category" class="category-input" type="text" placeholder="Category" autocomplete="off" value="{{categoryName::input}}">
+          <input id="budget" class="category-input" type="number" placeholder="0.00" autocomplete="off" value="{{budget::input}}">
           <input class="pure-button pure-button-primary category-input" type="submit" on-tap="createCategory" value="Add">
         </fieldset>
       </form>

@@ -32,7 +32,7 @@
       }
       .remaining {
         font-size: 1.2em;
-        font-weight: 100;
+        font-weight: 400;
         display: inline;
       }
       .card {
@@ -58,7 +58,7 @@
         <div class='pure-u-1'>
           <budget-bar item="[[item]]"></budget-bar>
           <div class="budget-details">
-            <div class="remaining">Remaining: <strong>[[_calcRemaining(item.budget, item.total)]]</strong></div>
+            <div class="remaining">Remaining: <strong id="remaining">[[_calcRemaining(item.budget, item.total)]]</strong></div>
             <button class="flex pure-button pure-button-primary" on-tap="viewDetails">Details</button>
           </div>
         </div>
@@ -87,7 +87,14 @@
         }
       },
       _calcRemaining: function(budget, spent) {
-        return '$' + (budget - spent);
+        var remaining = budget - spent;
+        if (remaining >= 0) {
+          this.$.remaining.style.color = '#7BA332';
+        } else {
+          this.$.remaining.style.color = 'red';
+        }
+        
+        return '$' + remaining;
       },
             
       deleteItem: function(e) {

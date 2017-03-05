@@ -115,7 +115,7 @@
         
       </iron-pages>
     </div>
-    <paper-dialog id="modal" modal>
+    <paper-dialog id="delete-modal" modal>
       <div class="delete-modal">
         <h4 hidden='[[!_isDeleteCategory(deleteType)]]'>Are you sure that you want to delete this Category?</h4>
         <h4 hidden='[[_isDeleteCategory(deleteType)]]'>Are you sure that you want to delete this Expense?</h4>
@@ -204,7 +204,8 @@
       'delete-category': 'openDeleteCategoryModal',
       'view-details' : 'viewDetails',
       'add-expense' : 'addExpense',
-      'delete-expense': 'openDeleteExpenseModal'
+      'delete-expense': 'openDeleteExpenseModal',
+      'update-category': 'updateCategory'
       },
       ready: function() {
         if (!this.routeData.page) window.location.replace(window.location.origin + "/#/home");
@@ -380,12 +381,12 @@
       openDeleteCategoryModal: function(e) {
         this.deleteItem = e.detail;
         this.deleteType = 'category';
-        this.$.modal.open();
+        this.$['delete-modal'].open();
       },
       openDeleteExpenseModal: function(e) {
         this.deleteItem = e.detail;
         this.deleteType = 'expense';
-        this.$.modal.open();
+        this.$['delete-modal'].open();
       },
       /**
       * Detele a category
@@ -395,12 +396,12 @@
         var catRef = firebase.database().ref('users/' + this.userId + '/' + this.date.getFullYear()+ '/' + this.month + '/' + item.id);
         catRef.remove().then(function() {
           // console.log("Remove succeeded.")
-          _this.$.modal.close();
+          _this.$['delete-modal'].close();
           this.deleteItem = '';
         })
         .catch(function(error) {
           console.log("Remove failed: " + error.message);
-          this.$.modal.close();
+          this.$['delete-modal'].close();
         });
       },
       /**
@@ -427,12 +428,12 @@
         firebase.database()
           .ref('users/' + this.userId + '/' + this.date.getFullYear() + '/' + this.month + '/' + item.itemId + '/expenses/' + item.expId)
           .remove().then(function() {
-            _this.$.modal.close();
+            _this.$['delete-modal'].close();
             this.deleteItem = '';
           })
           .catch(function(error) {
             console.log('Remove expenses: ', error.message);
-            _this.$.modal.close();
+            _this.$['delete-modal'].close();
           })
 
         firebase.database()
@@ -449,6 +450,13 @@
       },
       _isDeleteCategory: function(type) {
         return type === "category";
+      },
+      updateCategory: function(e) {
+        console.log('Title', e.detail)
+        firebase.database()
+          .ref('users/' + this.userId + '/' + this.date.getFullYear() + '/' + this.month + '/' + e.detail.id).update({
+            category: e.detail.title
+        });
       }
     });
   </script>

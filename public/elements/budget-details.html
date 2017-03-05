@@ -46,6 +46,24 @@
         border-bottom: 1px solid grey;
       }
 
+      .edit-form {
+        text-align: center;
+      }
+
+      .edit-btn-wrapper {
+        display: flex;
+        justify-content: space-around;
+      }
+
+      .edit-btn {
+        margin: 10px 0;
+      }
+
+      .edit-title {
+         font-size: 2em;
+         font-weight: 300;
+      }
+
       input {
         width: 80%;
         border: 1px solid #ccc;
@@ -55,8 +73,18 @@
       }
 
     </style>
-      <h1 class="title">[[item.category]]<span> Details</span></h1>
-
+      <div on-tap='startEditMode' hidden="[[editMode]]">
+        <h1 class="title">[[item.category]]<span> Details</span></h1>
+      </div>
+      <div hidden="[[!editMode]]">
+        <form class='edit-form' on-submit="updateCategory">
+          <input class="edit-title" type="text" name="" autocomplete="off" value="{{item.category::input}}">
+        </form>
+        <div class='edit-btn-wrapper'>
+          <button class="edit-btn pure-button" on-tap="cancelEdit">Cancel</button>
+          <button class="edit-btn pure-button pure-button-primary" on-tap="updateCategory">Update</button>
+        </div>
+      </div>
       <!-- Budget -->
       <div class="pure-g budget-wrapper">
         <div class="pure-u-12-24"><h3>Budget</h3></div>
@@ -87,7 +115,7 @@
       </div>
       <div class="pure-g budget-wrapper">
         <div class="pure-u-12-24"><h3>Remaining</h3></div>
-        <div class="pure-u-6-24 budget"><h3><span>$</span>[[_calcRemaining(item.*)]]</h3></div>
+        <div id="remaining" class="pure-u-6-24 budget"><h3><span>$</span>[[_calcRemaining(item.*)]]</h3></div>
         <div class="pure-u-6-24"></div>
       </div>
 
@@ -95,10 +123,10 @@
       <form on-submit="addExpense">
         <div class="pure-g expenses">
           <div class="pure-u-12-24">
-            <input type="text" name="description" placeholder="Description" value="{{description::input}}">  
+            <input type="text" name="description" placeholder="Description" autocomplete="off" value="{{description::input}}">  
           </div>
           <div class="pure-u-6-24">
-            <input type="number" name="amount" placeholder="Amount" value="{{amount::input}}">
+            <input type="number" name="amount" placeholder="Amount" autocomplete="off" value="{{amount::input}}">
           </div>
           <div class="pure-u-6-24 btn">
             <input class="pure-button pure-button-primary" type="submit" value="Add"> 
@@ -128,6 +156,10 @@
           type: Number,
           value: null
         },
+        editMode: {
+          type: Boolean,
+          value: false
+        }
       },
       addExpense: function(e) {
         e.preventDefault();
@@ -144,11 +176,30 @@
         var newTotal = parseFloat(this.item.total) - parseFloat(expense.amount);
         this.fire('delete-expense', { itemId: this.item.id, expId: expense.id, newTotal: newTotal })
       },
+      startEditMode: function() {
+        this.editMode = true;
+      },
+      cancelEdit: function(e) {
+        e.stopPropagation();
+        this.editMode = false;
+      },
+      updateCategory: function(e) {
+        e.preventDefault();
+        console.log(this.item.category);
+        this.fire('update-category', {'id': this.item.id, 'title': this.item.category});
+        this.editMode = false;
+      },
       _getEntry: function(index) {
         return index + 1;
       },
       _calcRemaining: function(item) {
-        return (this.item.budget - this.item.total).toFixed(2) || '';
+        var remaining = this.item.budget - this.item.total;
+        if (remaining >= 0) {
+          this.$.remaining.style.color = '#7BA332';
+        } else {
+          this.$.remaining.style.color = 'red';
+        }
+        return remaining.toFixed(2) || '';
       }
     });
   </script>

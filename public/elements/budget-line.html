@@ -1,0 +1,72 @@
+<link rel="import" href="../components/polymer/polymer.html">
+
+<!--
+A comment describing this element
+
+Example:
+
+    <my-elem></my-elem>
+
+Example:
+
+    <my-elem>
+      <h2>Hello my-elem</h2>
+    </my-elem>
+
+@demo demo/index.html
+-->
+
+<dom-module id="budget-line">
+	<template>
+		<style>
+			:host {
+				display: block;
+			}
+			.wrapper {
+				/*background-color:lightblue;*/
+				width: 50%;
+				margin: auto;
+				padding-bottom: 1px;
+			}
+
+			#fill {
+				height: 10px;
+				background-color: #7BA332
+			}
+		</style>
+
+		<div class='wrapper'>
+			<div id='fill'></div>
+		</div>
+		
+	</template>
+	<script>
+		Polymer({
+			is: 'budget-line',
+			properties: {
+        item: {
+          type: Object,
+          value: function() {
+            return {}
+          }
+        }
+      },
+      observers: [
+        'updateFill(item.*)'
+      ],
+      updateFill: function(e) {
+      	Polymer.dom.flush();
+        // This needs to be set later for animation
+          var diff = this.item.total / this.item.budget * 100;
+          if (diff > 100) {
+            diff = 100;
+            this.$.fill.style.backgroundColor = "red";
+          } else if (diff === 0) {
+          	diff = 1;
+          	this.$.fill.style.backgroundColor = "#7f8084";
+          }
+          this.$.fill.style.width = diff + '%';
+      }
+		});
+	</script>
+</dom-module>
