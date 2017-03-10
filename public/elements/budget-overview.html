@@ -24,10 +24,25 @@
       .add-category {
         text-align: center;
       }
+      .align-right {
+        text-align: right;
+      }
+      .totals {
+        width: 60%;
+        margin: auto;
+      }
+      .bold {
+        font-weight: bold;
+      }
+      .totals-content {
+        margin-bottom: 5px;
+        margin-top: 5px;
+      }
+
       @media (max-width: 375px) {
         .category-input {
           margin-bottom: 5px;
-          width: 80%;
+          width: 70%;
         }
       }
     </style>
@@ -42,6 +57,28 @@
       <template is="dom-repeat" items="[[items]]">
         <budget-line item='[[item]]'></budget-line>
       </template>
+      <!-- <h3><span>Remaining: $</span><span>[[_getDiff(budgetTotal, spentTotal)]]</span></h3> -->
+    </div>
+    <div class="pure-g totals">
+      <div class="pure-u-1-2">
+        <h3 class="totals-content">Total Budget:</h3>
+      </div>
+      <div class="pure-u-1-2 align-right">
+        <h3 class="totals-content"><span>$</span>[[_formatTotal(budgetTotal)]]</h3>
+      </div>
+
+      <div class="pure-u-1-2">
+        <h3 class="totals-content">Total Spent:</h3>
+      </div>
+      <div class="pure-u-1-2 align-right">
+        <h3 class="totals-content"><span>$</span>[[_formatTotal(spentTotal)]]</h3>
+      </div>
+      <div class="pure-u-1-2">
+        <h3 class='bold'>Remaining:</h3>
+      </div>
+      <div class="pure-u-1-2 align-right">
+        <h3 class='bold'><span id="remaining"><span>$</span>[[_getDiff(budgetTotal, spentTotal)]]</span></h3>
+      </div>
     </div>
     <hr>
 
@@ -50,7 +87,7 @@
       <hr>
     </template>
 
-    <div class="add-category">
+    <div id='scrollBottom' class="add-category">
       <h2>Add a new category</h2>
       <form class="pure-form" on-submit='createCategory'>
         <fieldset>
@@ -103,6 +140,14 @@
         budget: {
           type: Number,
           value: null
+        },
+        budgetTotal: {
+          type: Number,
+          value: null
+        },
+        spentTotal: {
+          type: Number,
+          value: null
         }
       },
       _getDateString: function(e) {
@@ -113,6 +158,20 @@
         var d = new Date();
         this.fire('create-category', { categoryName: this.categoryName, budget: this.budget, year: this.date.getFullYear(), month: this.month });
         this.categoryName = this.budget = null;
+      },
+      _formatTotal: function(total) {
+        return total.toFixed(2);
+      },
+      _getDiff: function(budget, spent) {
+        var diff = budget - spent;
+        if (diff < 0) {
+          this.$.remaining.style.color = 'red';
+        } else if (diff > 0) {
+          this.$.remaining.style.color = '#7BA332';
+        } else {
+          this.$.remaining.style.color = 'black';
+        }
+        return diff.toFixed(2);
       }
     });
   </script>

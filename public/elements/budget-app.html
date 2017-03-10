@@ -107,11 +107,13 @@
             name="home" 
             items="[[items]]" 
             date="{{date}}"
-            month="{{month}}"></budget-overview>
+            month="{{month}}"
+            budget-total="[[budgetTotal]]"
+            spent-total="[[spentTotal]]"></budget-overview>
 
           <budget-details id="details" name="details"></budget-details>
           
-          <p name="view404">404</p>
+          <h3 name="view404">404 Not Found</h3>
         
       </iron-pages>
     </div>
@@ -191,6 +193,14 @@
         userName: {
           type: String,
           value: ''
+        },
+        budgetTotal: {
+          type: Number,
+          value: 0
+        },
+        spentTotal: {
+          type: Number,
+          value: 0
         }
       },
       observers: [
@@ -347,10 +357,14 @@
         var keys = Object.keys(snapshot.val());
         var items = [];
         var expenses = [];
+        this.budgetTotal = 0;
+        this.spentTotal = 0;
         // convert the object into an array of items
         items = keys.map(function(item) {
           var obj = snapshot.val()[item];
           obj.id = item;
+          this.budgetTotal += parseFloat(obj.budget);
+          this.spentTotal += parseFloat(obj.total);
           if (obj.expenses) {
             expenses = Object.keys(obj.expenses).map(function(expKey) {
               var exp = obj.expenses[expKey];
@@ -360,8 +374,9 @@
             obj.expenses = expenses;
           }
           return obj;
-        })
+        }.bind(this))
         this.items = items;
+
 
         if (this.page === 'details') {
          this.$.details.item = items[this.subroute.path.match(/[0-9]+/)[0]] 
