@@ -55,7 +55,7 @@
       <form class="pure-form" on-submit='createCategory'>
         <fieldset>
           <input id="category" class="category-input" type="text" placeholder="Category" autocomplete="off" value="{{categoryName::input}}">
-          <input id="budget" class="category-input" type="number" placeholder="0.00" autocomplete="off" value="{{budget::input}}">
+          <input id="budget" class="category-input" type="number" step="0.01" placeholder="0.00" autocomplete="off" value="{{budget::input}}">
           <input class="pure-button pure-button-primary category-input" type="submit" on-tap="createCategory" value="Add">
         </fieldset>
       </form>
