@@ -29,6 +29,7 @@
       }
       .totals {
         width: 60%;
+        min-width: 250px;
         margin: auto;
       }
       .bold {
@@ -57,7 +58,6 @@
       <template is="dom-repeat" items="[[items]]">
         <budget-line item='[[item]]'></budget-line>
       </template>
-      <!-- <h3><span>Remaining: $</span><span>[[_getDiff(budgetTotal, spentTotal)]]</span></h3> -->
     </div>
     <div class="pure-g totals">
       <div class="pure-u-1-2">
