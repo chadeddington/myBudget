@@ -64,6 +64,11 @@
          font-weight: 300;
       }
 
+      .error-text {
+        color: red;
+        font-weight: bold;
+      }
+
       input {
         width: 80%;
         border: 1px solid #ccc;
@@ -159,10 +164,21 @@
         editMode: {
           type: Boolean,
           value: false
+        },
+        error: {
+          type: Boolean,
+          value: false,
+          notify: true
         }
       },
       addExpense: function(e) {
         e.preventDefault();
+        if (!this.description || !this.amount || isNaN(this.amount)) {
+          this.error = true;
+          return;
+        } else {
+          this.error = false;
+        }
         var description = this.description;
         var amount = this.amount;
         // Reset

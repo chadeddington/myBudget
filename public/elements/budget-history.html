@@ -1,0 +1,77 @@
+<link rel="import" href="/polymer/polymer.html">
+
+<!--
+A comment describing this element
+
+Example:
+
+    <my-elem></my-elem>
+
+Example:
+
+    <my-elem>
+      <h2>Hello my-elem</h2>
+    </my-elem>
+
+@demo demo/index.html
+-->
+
+<dom-module id="budget-history">
+	<template>
+		<style>
+			:host {
+				display: block;
+			}
+		</style>
+
+		<h2>History</h2>
+		<template is="dom-repeat" items="[[years]]">
+			<span>[[item.year]]</span>
+			<ul>
+				<template is="dom-repeat" items="[[item.months]]" as="month">
+					<li><a href="[[_getLink(item.year, month)]]">[[month]]</a></li>
+				</template>
+			</ul>
+		</template>
+		
+	</template>
+	<script>
+		Polymer({
+			is: 'budget-history',
+			properties: {
+				history: {
+					type: Object,
+					value: function() { return {}; }
+				},
+				years: {
+					type: Array,
+					value: function() { return []; }
+				}
+			},
+			observers: [
+				'_parseHistory(history)'
+			],
+			/**
+			 * Create the history list to display
+			 */
+			_parseHistory: function(history) {
+				years = Object.keys(history).map(function(year) {
+					var details = {};
+					details.year = year;
+					details.months = [];
+					Object.keys(history[year]).forEach(function(month) {
+						details.months.push(history[year][month]);
+					})
+					return details;
+				});
+				this.years = years;
+			},
+			/**
+			 * Create the link to grab the history
+			 */
+			_getLink: function(year, month) {
+				return year + "/" + month;
+			}
+		});
+	</script>
+</dom-module>

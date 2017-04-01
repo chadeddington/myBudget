@@ -7,6 +7,7 @@
 <link rel="import" href="budget-login.html">
 <link rel="import" href="budget-overview.html">
 <link rel="import" href="budget-details.html">
+<link rel="import" href="budget-history.html">
 <!-- import style module  -->
 <link rel="import" href="bs-styles.html">
 
@@ -24,9 +25,16 @@
         padding-top: 70px;
       }
 
-      .delete-modal {
+      .delete-modal, .error-modal {
         font-size: 18px;
       }
+
+      .error-modal {
+        min-width:  300px;
+        text-align: center;
+        padding: 10px;
+      }
+
 
       .btn-wrapper {
         text-align: center;
@@ -77,17 +85,18 @@
     <!--Route handler-->
     <app-location route="{{route}}" use-hash-as-path></app-location>
     <app-route
-        route="{{route}}"
-        pattern="/:page"
-        data="{{routeData}}"
-        tail="{{subroute}}"></app-route>
+      route="{{route}}"
+      pattern="/:page"
+      data="{{routeData}}"
+      tail="{{subroute}}">
+    </app-route>
     
     <iron-selector selected="[[page]]" attr-for-selected="name" class="drawer-list" role="navigation">
       <nav class="pure-menu pure-menu-horizontal">
         <ul class="nav-list">
+          <li class="pure-menu-item"><a class="pure-menu-link" name="history" href="#/history">History</a></li>
           <li class="pure-menu-item"><a class="pure-menu-link" name="home" href="#/home">Overview</a></li>
-          <li class="pure-menu-item"><a class="pure-menu-link" name="home" href="#/home">[[userName]]</a></li>
-          <li class="pure-menu-item"><a class="pure-menu-link" on-tap="signOut">Sign Out</a></li>
+          <li class="pure-menu-item"><a class="pure-menu-link" on-tap="signOut">[[userName]]</a></li>
         </ul>
       </nav>
     </iron-selector>
@@ -99,24 +108,56 @@
           attr-for-selected="name"
           fallback-selection="view404"
           role="main">
-        
+
           <!--Log in View-->
           <budget-login name="login"></budget-login>
+
+          <!-- History View -->
+          <budget-history name="history"
+            history="[[history]]"> 
+          </budget-history>
+
           <!-- Main View-->
           <budget-overview 
             name="home" 
             items="[[items]]" 
             date="{{date}}"
             month="{{month}}"
+            error="{{error}}"
             budget-total="[[budgetTotal]]"
             spent-total="[[spentTotal]]"></budget-overview>
 
-          <budget-details id="details" name="details"></budget-details>
+          <budget-details
+            id="details" 
+            name="details"
+            error="{{error}}"></budget-details>
           
+          <!-- Not Found View -->
           <h3 name="view404">404 Not Found</h3>
         
       </iron-pages>
     </div>
+
+    <!-- Details Modal -->
+    <paper-dialog id="details-modal" modal>
+      <div>
+      <!-- <budget-details
+        id="details" 
+        name="details"
+        error="{{error}}"></budget-details> -->
+      </div>
+    </paper-dialog>
+
+    <!-- Error Modal -->
+    <paper-dialog id="error-modal" modal>
+      <div class="error-modal">
+        <h2>Oops!</h2>
+        <p>There was an error</p>
+        <button class="pure-button button-warning" on-tap='_closeErrorModal'>Okay</button>
+      </div>
+    </paper-dialog>
+
+    <!-- Delete Modal -->
     <paper-dialog id="delete-modal" modal>
       <div class="delete-modal">
         <h4 hidden='[[!_isDeleteCategory(deleteType)]]'>Are you sure that you want to delete this Category?</h4>
@@ -183,6 +224,10 @@
           },
           notify: true
         },
+        error: {
+          type: Boolean,
+          value: false
+        },
         month: {
           type: String,
           value: function() {
@@ -205,6 +250,7 @@
       },
       observers: [
         '_routePageChanged(routeData.page, subroute.path)',
+        'toggleErrorModal(error)'
       ],
       listeners : {
       'register-user': 'register',
@@ -221,9 +267,57 @@
         if (!this.routeData.page) window.location.replace(window.location.origin + "/#/home");
       },
       /**
+       * When the route changes
+       */
+      _routePageChanged: function(page, tail) {
+        this.page = page || 'home';
+
+        console.log('page', this.page);
+
+        if (page === 'history') {
+          this.getHistory();
+        }
+
+        this.getItems();
+
+        // Handle subroutes
+        if (tail && page === 'details') {
+           var index = tail.match(/[0-9]+/)[0];
+          if (this.items.length) {
+            // If the items are on the page, pass in the right one
+            this.$.details.item = this.items[index];
+            this.$.details.index = index;
+          } else {
+            // If they are not on the page pull down the one 
+            this.$.details.index = index;
+          }  
+        }
+      },
+      /**
+       * Get the users budget history
+       */
+      getHistory: function() {
+        firebase.auth().onAuthStateChanged(function(user) {
+          if (user) {
+            this.user = user
+            this.userId = user.uid;
+            var historyRef = '/users/' + this.userId + '/history';
+            // Pull down their history
+            firebase.database().ref(historyRef).once('value').then(function(snapshot) {
+              this.history = snapshot.val();
+            }.bind(this));
+          } else {
+            // No user is signed in.
+            console.log('no user is logged in');
+            window.location.replace(window.location.origin + "/#/login")
+          }
+        }.bind(this));
+      },
+      /**
       * Set up value change listener on the data
       */
       getItems: function() {
+        if (this.items.length > 0) return;
         firebase.auth().onAuthStateChanged(function(user) {
           if (user) {
             this.user = user
@@ -245,26 +339,6 @@
             window.location.replace(window.location.origin + "/#/login")
           }
         }.bind(this));
-      },
-      _routePageChanged: function(page, tail) {
-        this.page = page || 'home';
-
-        console.log('page', this.page);
-
-        this.getItems();
-
-        // Handle subroutes
-        if (tail && page === 'details') {
-           var index = tail.match(/[0-9]+/)[0];
-          if (this.items.length) {
-            // If the items are on the page, pass in the right one
-            this.$.details.item = this.items[index];
-            this.$.details.index = index;
-          } else {
-            // If they are not on the page pull down the one 
-            this.$.details.index = index;
-          }  
-        }
       },
       /*
       * Register a new user
@@ -337,7 +411,6 @@
         firebase.auth().onAuthStateChanged(function(user) {
           if (user) {
             // User is signed in.
-            console.log("You are signed in!", user.email)
             this.userId = user.uid;
           } else {
             // No user is signed in.
@@ -386,6 +459,13 @@
       * Create a new category
       */
       createCategory: function(e) {
+        // If this is the first time writing update the history list
+        // TURN THIS BACK ON LATER
+        // if (!this.items) {
+          var updateData = {}
+          updateData[e.detail.month] = e.detail.month;
+          firebase.database().ref('users/' + this.userId + '/history/' + e.detail.year).update(updateData);
+        // }
         // Add category to firebase
         firebase.database().ref('users/' + this.userId + '/' + e.detail.year + '/' + e.detail.month).push().set({
           category: e.detail.categoryName,
@@ -466,12 +546,25 @@
       _isDeleteCategory: function(type) {
         return type === "category";
       },
+      /**
+       * Update an existing category
+       */
       updateCategory: function(e) {
         console.log('Title', e.detail)
         firebase.database()
           .ref('users/' + this.userId + '/' + this.date.getFullYear() + '/' + this.month + '/' + e.detail.id).update({
             category: e.detail.title
         });
+      },
+      toggleErrorModal: function(error) {
+        if (error) { 
+          this.$['error-modal'].open();
+        } else {
+          this.$['error-modal'].close();
+        }
+      },
+      _closeErrorModal: function() {
+        this.error = false;
       }
     });
   </script>

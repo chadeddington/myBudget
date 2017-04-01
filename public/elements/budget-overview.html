@@ -21,6 +21,10 @@
       h1,h2,h3,h4 {
         font-weight: 300;
       }
+      .error-text {
+        color: red;
+        font-weight: bold;
+      }
       .add-category {
         text-align: center;
       }
@@ -148,6 +152,11 @@
         spentTotal: {
           type: Number,
           value: null
+        },
+        error: {
+          type: Boolean,
+          value: false,
+          notify: true
         }
       },
       _getDateString: function(e) {
@@ -156,6 +165,12 @@
       createCategory: function(e) {
         e.preventDefault();
         var d = new Date();
+        if (!this.categoryName  || !this.budget || isNaN(this.budget)) {
+          this.error = true;
+          return;
+        } else {
+          this.error = false;
+        }
         this.fire('create-category', { categoryName: this.categoryName, budget: this.budget, year: this.date.getFullYear(), month: this.month });
         this.categoryName = this.budget = null;
       },
